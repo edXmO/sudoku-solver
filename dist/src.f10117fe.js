@@ -117,13 +117,49 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/Canvas.ts":[function(require,module,exports) {
+})({"src/Cell.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Cell = void 0;
+
+var Cell =
+/** @class */
+function () {
+  function Cell(x, y, data, height, width) {
+    this.x = x;
+    this.y = y;
+    this.data = data;
+    this.height = height;
+    this.width = width;
+  }
+
+  Cell.prototype.show = function () {
+    console.log("x coord: ", this.x, "y coord", this.y);
+  };
+
+  Object.defineProperty(Cell.prototype, "value", {
+    get: function get() {
+      return this.data;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  return Cell;
+}();
+
+exports.Cell = Cell;
+},{}],"src/Canvas.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.Canvas = void 0;
+
+var Cell_1 = require("./Cell");
 
 var Canvas =
 /** @class */
@@ -135,9 +171,10 @@ function () {
     this.ctx = ctx;
     this.backgroundColor = "#565656";
     this.strokeStyle = "#FFF";
-    this.resolution = this.width / 9;
     this.ROWS = 9;
     this.COLS = 9;
+    this.res = this.width / this.ROWS;
+    this.grid = [];
     this.canvas = canvas;
     this.ctx = ctx;
     this.canvas.height = height;
@@ -146,43 +183,52 @@ function () {
     this.ctx.strokeStyle = this.strokeStyle;
   }
 
-  Canvas.prototype.drawCanvas = function () {
-    for (var i = 0; i < this.width; i += this.resolution) {
-      for (var j = 0; j < this.height; j += this.resolution) {
+  Canvas.prototype.create = function () {
+    for (var i = 0; i < this.ROWS; i++) {
+      this.grid[i] = [];
+
+      for (var j = 0; j < this.COLS; j++) {
+        var cell = new Cell_1.Cell(i, j, 0, this.res, this.res);
+        this.grid[i][j] = cell;
         this.ctx.beginPath();
         this.ctx.strokeStyle = this.strokeStyle;
-        this.ctx.rect(i, j, this.resolution, this.resolution);
+        this.ctx.rect(i * this.res, j * this.res, this.res, this.res);
         this.ctx.stroke();
       }
     }
+  };
+
+  Canvas.prototype.colorCell = function (row, col) {
+    var _a = this.grid[row][col],
+        x = _a.x,
+        y = _a.y,
+        height = _a.height,
+        width = _a.width;
+    this.ctx.fillStyle = "#fff";
+    this.ctx.beginPath();
+    this.ctx.moveTo(x, y);
+    this.ctx.fillRect(x, y, height, width);
+  };
+
+  Canvas.prototype.printNumber = function (row, col) {
+    var _a = this.grid[row][col],
+        x = _a.x,
+        y = _a.y,
+        height = _a.height,
+        width = _a.width,
+        value = _a.value;
+    this.ctx.fillStyle = "#fff";
+    this.ctx.beginPath();
+    this.ctx.moveTo(x, y);
+    this.ctx.font = '50px serif';
+    this.ctx.fillText("" + value, x, y);
   };
 
   return Canvas;
 }();
 
 exports.Canvas = Canvas;
-},{}],"src/Cell.ts":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Cell = void 0;
-
-var Cell =
-/** @class */
-function () {
-  function Cell(x, y, value) {
-    this.x = x;
-    this.y = y;
-    this.value = value;
-  }
-
-  return Cell;
-}();
-
-exports.Cell = Cell;
-},{}],"src/Sudoku.ts":[function(require,module,exports) {
+},{"./Cell":"src/Cell.ts"}],"src/Sudoku.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -213,14 +259,6 @@ var __extends = this && this.__extends || function () {
   };
 }();
 
-var __spreadArray = this && this.__spreadArray || function (to, from) {
-  for (var i = 0, il = from.length, j = to.length; i < il; i++, j++) {
-    to[j] = from[i];
-  }
-
-  return to;
-};
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -228,39 +266,37 @@ exports.Sudoku = void 0;
 
 var Canvas_1 = require("./Canvas");
 
-var Cell_1 = require("./Cell");
-
 var Sudoku =
 /** @class */
 function (_super) {
   __extends(Sudoku, _super);
 
   function Sudoku(height, width, canvas, ctx) {
-    var _this = _super.call(this, height, width, canvas, ctx) || this;
-
-    _this.grid = __spreadArray([], Array(9).map(function (e) {
-      return Array(9);
-    }));
-    _this.counter = 0;
-    return _this;
+    return _super.call(this, height, width, canvas, ctx) || this;
   }
 
-  Sudoku.prototype.fill2DGrid = function () {
-    for (var i = 0; i <= this.ROWS; i++) {
-      this.grid[i] = [];
-
-      for (var j = 0; j <= this.COLS; j++) {
-        var cell = new Cell_1.Cell(i, j, Math.floor(Math.random() * 9));
-        this.grid[i][j] = cell;
-      }
-    }
+  Sudoku.prototype.isAllowed = function () {
+    return false;
   };
 
+  ;
+
+  Sudoku.prototype.checkRow = function () {};
+
+  ;
+
+  Sudoku.prototype.checkCol = function () {};
+
+  ;
+
+  Sudoku.prototype.check3x3 = function () {};
+
+  ;
   return Sudoku;
 }(Canvas_1.Canvas);
 
 exports.Sudoku = Sudoku;
-},{"./Canvas":"src/Canvas.ts","./Cell":"src/Cell.ts"}],"src/index.ts":[function(require,module,exports) {
+},{"./Canvas":"src/Canvas.ts"}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -271,9 +307,15 @@ var Sudoku_1 = require("./Sudoku");
 
 var canvas = document.querySelector('.canvas-gl');
 var ctx = canvas.getContext("2d");
-var sudoku = new Sudoku_1.Sudoku(400, 400, canvas, ctx);
-sudoku.drawCanvas();
-sudoku.fill2DGrid();
+var requestAnimationID;
+var maxFps = 60;
+var sudoku = new Sudoku_1.Sudoku(500, 500, canvas, ctx);
+sudoku.create();
+sudoku.printNumber(0, 0);
+
+var tick = function tick(timestamp) {
+  requestAnimationID = requestAnimationFrame(tick);
+};
 },{"./Sudoku":"src/Sudoku.ts"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
