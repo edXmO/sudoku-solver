@@ -131,22 +131,29 @@ function () {
   function Canvas(height, width, canvas, ctx) {
     this.height = height;
     this.width = width;
+    this.canvas = canvas;
+    this.ctx = ctx;
     this.backgroundColor = "#565656";
     this.strokeStyle = "#FFF";
-    this.fillStyle = "#FFF";
     this.resolution = this.width / 9;
+    this.ROWS = 9;
+    this.COLS = 9;
     this.canvas = canvas;
     this.ctx = ctx;
     this.canvas.height = height;
     this.canvas.width = width;
     this.canvas.style.background = this.backgroundColor;
-    this.ctx.fillStyle = this.fillStyle;
     this.ctx.strokeStyle = this.strokeStyle;
   }
 
-  Canvas.prototype.drawGrid = function () {
+  Canvas.prototype.drawCanvas = function () {
     for (var i = 0; i < this.width; i += this.resolution) {
-      for (var j = 0; j < this.height; j += this.resolution) {}
+      for (var j = 0; j < this.height; j += this.resolution) {
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = this.strokeStyle;
+        this.ctx.rect(i, j, this.resolution, this.resolution);
+        this.ctx.stroke();
+      }
     }
   };
 
@@ -154,20 +161,120 @@ function () {
 }();
 
 exports.Canvas = Canvas;
-},{}],"src/index.ts":[function(require,module,exports) {
+},{}],"src/Cell.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Cell = void 0;
+
+var Cell =
+/** @class */
+function () {
+  function Cell(x, y, value) {
+    this.x = x;
+    this.y = y;
+    this.value = value;
+  }
+
+  return Cell;
+}();
+
+exports.Cell = Cell;
+},{}],"src/Sudoku.ts":[function(require,module,exports) {
+"use strict";
+
+var __extends = this && this.__extends || function () {
+  var _extendStatics = function extendStatics(d, b) {
+    _extendStatics = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) {
+        if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p];
+      }
+    };
+
+    return _extendStatics(d, b);
+  };
+
+  return function (d, b) {
+    if (typeof b !== "function" && b !== null) throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+
+    _extendStatics(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+}();
+
+var __spreadArray = this && this.__spreadArray || function (to, from) {
+  for (var i = 0, il = from.length, j = to.length; i < il; i++, j++) {
+    to[j] = from[i];
+  }
+
+  return to;
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Sudoku = void 0;
+
+var Canvas_1 = require("./Canvas");
+
+var Cell_1 = require("./Cell");
+
+var Sudoku =
+/** @class */
+function (_super) {
+  __extends(Sudoku, _super);
+
+  function Sudoku(height, width, canvas, ctx) {
+    var _this = _super.call(this, height, width, canvas, ctx) || this;
+
+    _this.grid = __spreadArray([], Array(9).map(function (e) {
+      return Array(9);
+    }));
+    _this.counter = 0;
+    return _this;
+  }
+
+  Sudoku.prototype.fill2DGrid = function () {
+    for (var i = 0; i <= this.ROWS; i++) {
+      this.grid[i] = [];
+
+      for (var j = 0; j <= this.COLS; j++) {
+        var cell = new Cell_1.Cell(i, j, Math.floor(Math.random() * 9));
+        this.grid[i][j] = cell;
+      }
+    }
+  };
+
+  return Sudoku;
+}(Canvas_1.Canvas);
+
+exports.Sudoku = Sudoku;
+},{"./Canvas":"src/Canvas.ts","./Cell":"src/Cell.ts"}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var Canvas_1 = require("./Canvas");
+var Sudoku_1 = require("./Sudoku");
 
 var canvas = document.querySelector('.canvas-gl');
 var ctx = canvas.getContext("2d");
-var grid = new Canvas_1.Canvas(500, 500, canvas, ctx);
-grid.drawGrid();
-},{"./Canvas":"src/Canvas.ts"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+var sudoku = new Sudoku_1.Sudoku(400, 400, canvas, ctx);
+sudoku.drawCanvas();
+sudoku.fill2DGrid();
+},{"./Sudoku":"src/Sudoku.ts"}],"../../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -195,7 +302,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57908" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63511" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
