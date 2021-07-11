@@ -1,3 +1,5 @@
+import { Cell } from "./Cell";
+
 export class Canvas {
 
   private canvas: HTMLCanvasElement;
@@ -19,11 +21,7 @@ export class Canvas {
 
   drawGrid(){
     for(let i = 0; i < this.width; i += this.resolution){
-      for(let j = 0; j < this.height; j += this.resolution){
-        this.ctx.beginPath();
-        this.ctx.strokeStyle = "#FFF"
-        this.ctx.rect(i, j, this.resolution, this.resolution);
-        this.ctx.stroke();
+      for(let j = 0; j < this.height; j += this.resolution){ 
       }
     }    
   }

@@ -146,12 +146,7 @@ function () {
 
   Canvas.prototype.drawGrid = function () {
     for (var i = 0; i < this.width; i += this.resolution) {
-      for (var j = 0; j < this.height; j += this.resolution) {
-        this.ctx.beginPath();
-        this.ctx.strokeStyle = "#FFF";
-        this.ctx.rect(i, j, this.resolution, this.resolution);
-        this.ctx.stroke();
-      }
+      for (var j = 0; j < this.height; j += this.resolution) {}
     }
   };
 
